@@ -15,10 +15,7 @@ export async function GET(req: NextRequest) {
 
     // Decode the JWT token to get userId
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET!) as { userId: string };
-    console.log(decoded);
-
-    // Fetch user data from the database using the userId
-    console.log(decoded);
+    
     
     if (!decoded) {
       return NextResponse.redirect(new URL("/login", req.nextUrl)); // Redirect if no user is found
