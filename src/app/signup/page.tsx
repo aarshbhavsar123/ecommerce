@@ -84,7 +84,6 @@ export default function FunctionSignupForm() {
                     <Input type="email" id="email" name="email" label="Email Address" placeholder="john_doe@gmail.com" autofocus={true} value={user.email} onChange={handleChange} />
                     <Input type="password" id="password" name="password" label="Password" placeholder="••••••••••" value={user.password} onChange={handleChange} />
 
-                    {/* Admin Checkbox */}
                     <label className="text-gray-500 block mt-3">
                       <span className='mr-5'>
                         Are you an Admin?

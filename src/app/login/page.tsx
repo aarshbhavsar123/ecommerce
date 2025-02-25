@@ -60,7 +60,7 @@ export default function FunctionLoginForm() {
 
     useEffect(() => {
         if (user.email.length > 0 && user.password.length > 0) {
-          // Handle user input changes
+          
           setDisabled(false);
         }
         else

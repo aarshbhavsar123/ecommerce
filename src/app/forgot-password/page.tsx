@@ -33,7 +33,7 @@ export default function ForgotPassword() {
     email: "",
   });
 
-  const [localOtp, setLocalOtp] = useState<string | null>(null); // ✅ Renamed to avoid conflict
+  const [localOtp, setLocalOtp] = useState<string | null>(null); 
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
 

@@ -7,28 +7,28 @@ connect();
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value; // Extract token from cookies
+    const token = req.cookies.get('token')?.value;
 
     if (!token) {
-      return NextResponse.redirect(new URL("/login", req.nextUrl)); // Redirect if no token
+      return NextResponse.redirect(new URL("/login", req.nextUrl)); 
     }
 
-    // Decode the JWT token to get userId
+   
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET!) as { userId: string };
     
     
     if (!decoded) {
-      return NextResponse.redirect(new URL("/login", req.nextUrl)); // Redirect if no user is found
+      return NextResponse.redirect(new URL("/login", req.nextUrl));
     }
     
     
     return NextResponse.json(decoded);
   } catch (error) {
     console.error(error);
-    return NextResponse.redirect(new URL("/login", req.nextUrl)); // Redirect on error
+    return NextResponse.redirect(new URL("/login", req.nextUrl)); 
   }
 }
 
 export const config = {
-  matcher: ['/dashboard/*', '/profile/*'], // Apply to dashboard and profile routes
+  matcher: ['/dashboard/*', '/profile/*'],
 };
