@@ -27,6 +27,7 @@ export const config = {
     "/login",
     "/signup",
     "/forget-password",
-    "/forget-password-otp"
+    "/forget-password-otp",
+    "/dashboard/:path*"
   ]
 }
