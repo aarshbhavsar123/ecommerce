@@ -26,7 +26,6 @@ function Input({ type, id, name, label, placeholder, autofocus, value, onChange 
 export default function FunctionLoginForm() {
     const router = useRouter();
     const [user, setUser] = React.useState({
-      
       email: "",
       password: "",
     });
@@ -40,8 +39,7 @@ export default function FunctionLoginForm() {
     };
 
     const handleSubmit = async () => {
-        // Implement sign-up logic
-        try
+      try
         {
             setLoading(true);
             const response = await axios.post("/api/users/login",user);
@@ -62,8 +60,8 @@ export default function FunctionLoginForm() {
 
     useEffect(() => {
         if (user.email.length > 0 && user.password.length > 0) {
-            // Handle user input changes
-            setDisabled(false);
+          // Handle user input changes
+          setDisabled(false);
         }
         else
         {
@@ -87,6 +85,7 @@ export default function FunctionLoginForm() {
           <form>
             <Input type="email" id="email" name="email" label="Email Address" placeholder="john_doe@gmail.com" autofocus={true} value={user.email} onChange={handleChange} />
             <Input type="password" id="password" name="password" label="Password" placeholder="••••••••••" value={user.password} onChange={handleChange} />
+            <p className="text-center text-gray-600 mt-4"><Link href="/forgot-password" className="text-blue-600 hover:underline">Forgot Password?</Link></p>
             <Button onClick={handleSubmit} />
             <p className="text-center text-gray-600 mt-4">Don't have an account? <Link href="/signup" className="text-blue-600 hover:underline">Sign Up</Link></p>
           </form>

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) 
 {
@@ -14,6 +14,11 @@ export function middleware(request: NextRequest)
     {
         return NextResponse.redirect(new URL("/login",request.nextUrl));
     }
+    const isForget = (path=="/forget-password"||path=="/forget-password-otp");
+    if(isForget && token)
+    {
+      return NextResponse.redirect(new URL("/",request.nextUrl));
+    }
 }
  
 export const config = {
@@ -21,5 +26,7 @@ export const config = {
     "/",
     "/login",
     "/signup",
+    "/forget-password",
+    "/forget-password-otp"
   ]
 }
