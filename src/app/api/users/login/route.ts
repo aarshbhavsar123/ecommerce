@@ -3,12 +3,25 @@ import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 connect();
 
 
 export async function POST(request:NextRequest)
 {
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com", 
+        port:465,
+        secure:true,
+        auth: {
+            user: process.env.MAIL,
+            pass: process.env.PASSWORD,
+        },
+        tls:{
+            rejectUnauthorized:false,
+        }
+    });
     try
     {
         const reqBody = await request.json();
@@ -34,7 +47,7 @@ export async function POST(request:NextRequest)
                     username:user.username,
                     email:user.email
                 }
-              
+                
                 const token = await jwt.sign(tokenData,process.env.TOKEN_SECRET!,{expiresIn:"1d"});
                 const response = NextResponse.json({
                     message:"Login Successful",
@@ -42,6 +55,21 @@ export async function POST(request:NextRequest)
 
                 })
                 response.cookies.set("token",token,{httpOnly:true});
+                transporter.verify(function (e,s){
+                    if(e)
+                    {
+                        console.error("SMTP Connection Error:", e);
+                    }
+                    else{
+                        console.log("ready");
+                    }
+                })
+                await transporter.sendMail({
+                    from: process.env.MAIL,
+                    to: email,
+                    subject: "Login Detected",
+                    text: `Hello ${user.username}, Login to amazon detected. Plese take action if it was not you.`,
+                });
                 return response;
             }
 
