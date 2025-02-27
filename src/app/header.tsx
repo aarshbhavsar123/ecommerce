@@ -11,7 +11,7 @@ import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { useAppContext } from '../context';
 import React from "react";
-
+import { useSelector } from 'react-redux';
 
 export default function Header() {
   const [cart, setCart] = useState<{ [key: number]: number }>({});
@@ -19,9 +19,8 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  
   const { user, setUser } = useAppContext();
-
+  
   const uniqueItemsCount = Object.keys(cart).length;
 
   const handleCartClick = () => {
@@ -41,11 +40,11 @@ export default function Header() {
       router.push("/login");
     } catch (e: any) {
       console.log(e.message);
-      
     }
   };
   const handleProfileClick = ()=>{
-    alert("Profile Clicked");
+    console.log(user);
+    router.push(`/profile/${user.id}`)
   }
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -57,7 +56,7 @@ export default function Header() {
         <div className="container mx-auto flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold">
-              <Link href="/">amazon</Link>
+              <Link href="/home">amazon</Link>
             </h1>
             
             <div className="flex md:hidden">
@@ -84,7 +83,7 @@ export default function Header() {
          
           <nav className={`${isMenuOpen ? 'block' : 'hidden'} md:block mt-4 md:mt-0`}>
             <ul className="flex flex-col md:flex-row gap-4 md:gap-6">
-              <li><Link href="/" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
+              <li><Link href="/home" onClick={() => setIsMenuOpen(false)}>Home</Link></li>
               <li><Link href="/about" onClick={() => setIsMenuOpen(false)}>About</Link></li>
               <li><Link href="/contact" onClick={() => setIsMenuOpen(false)}>Contact</Link></li>
               <li>

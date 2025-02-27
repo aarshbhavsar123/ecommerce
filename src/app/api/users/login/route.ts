@@ -45,14 +45,15 @@ export async function POST(request:NextRequest)
                 const tokenData = {
                     id:user._id,
                     username:user.username,
-                    email:user.email
+                    email:user.email,
+                    role:user.isAdmin,
                 }
-                
+                console.log(user);
                 const token = await jwt.sign(tokenData,process.env.TOKEN_SECRET!,{expiresIn:"1d"});
                 const response = NextResponse.json({
                     message:"Login Successful",
                     success:true,
-
+                    ...tokenData
                 })
                 response.cookies.set("token",token,{httpOnly:true});
                 transporter.verify(function (e,s){

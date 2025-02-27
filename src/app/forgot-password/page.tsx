@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { setOtp, setEmail } from "@/redux/slices/authSlices"; 
+import {setEmail } from "@/redux/slices/authSlices"; 
 import { AppDispatch } from "@/redux/store";
 
 function Input({ type, id, name, label, placeholder, autofocus, value, onChange }: any) {
@@ -31,6 +31,7 @@ export default function ForgotPassword() {
 
   const [user, setUser] = useState({
     email: "",
+    id:""
   });
 
  
@@ -50,6 +51,7 @@ export default function ForgotPassword() {
       const response = await axios.post("/api/users/send-otp", user);
       alert(`OTP sent to the email: ${user.email}`);
       dispatch(setEmail(user.email));
+      
       router.push("/forgot-password/otp");
       
     } catch (e: any) {

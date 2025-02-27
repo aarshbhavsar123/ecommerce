@@ -5,7 +5,9 @@ import axios  from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {toast} from "react-hot-toast";
-
+import { useDispatch } from "react-redux";
+import {setEmail,setId } from "@/redux/slices/authSlices"; 
+import { AppDispatch } from "@/redux/store";
 
 function Input({ type, id, name, label, placeholder, autofocus, value, onChange }: any) {
     return (
@@ -25,6 +27,7 @@ function Input({ type, id, name, label, placeholder, autofocus, value, onChange 
 
 export default function FunctionLoginForm() {
     const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
     const [user, setUser] = React.useState({
       email: "",
       password: "",
@@ -45,6 +48,7 @@ export default function FunctionLoginForm() {
             const response = await axios.post("/api/users/login",user);
             console.log("Signup Success",response.data);
             toast.success("Login Success");
+            console.log(dispatch(setId(response.data.id)));
             router.push("/home");
         }
         catch(e:any)
