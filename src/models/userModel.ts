@@ -25,11 +25,18 @@ const userSchema = new mongoose.Schema({
       type:mongoose.Schema.Types.ObjectId,
       ref:  "Cart",
      },
-     
+     otp:{
+      type:String,
+      default:"",
+     },
+     lastOtpReq: { 
+         type: String, 
+         default: "" ,
+     },
      forgotPasswordToken:String,
      forgotPasswordTokenExpiry:Date,
      verifyToken : String,
-     verifyTokenExpiry : Date
+     verifyTokenExpiry:Date
 })
 const User = mongoose.models.User||mongoose.model("User",userSchema);
 export default User;

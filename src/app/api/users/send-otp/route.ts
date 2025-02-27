@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import nodemailer from "nodemailer";
+import { useTheme } from "@emotion/react";
+import bcryptjs from "bcryptjs";
 connect();
 
 
@@ -22,14 +24,14 @@ export async function POST(req: NextRequest) {
             rejectUnauthorized:false,
         }
     });
-    console.log(process.env.PASSWORD);
+    
     try {
         
         
         const reqBody = await req.json();
         const { email } = reqBody;
-        console.log(process.env.MAIL);
-        console.log(email);
+        
+        
         const user = await User.findOne({ email });
         if (!user) {
             return NextResponse.json({ error: "User does not exist" }, { status: 400 });
@@ -51,9 +53,21 @@ export async function POST(req: NextRequest) {
             subject: "OTP to change the password",
             text: `OTP to change the password: ${otp}`,
         });
-        
-        console.log("Email sent:", info.response);
-        return NextResponse.json({ otp });
+        const salt = await bcryptjs.genSalt(10);
+        const hashedOTP = await bcryptjs.hash(String(otp), salt);
+
+        await User.updateOne(
+            { email: email },
+            { 
+                $set: { 
+                    lastOtpReq: Date.now(),
+                    otp: hashedOTP,
+                } 
+            }
+        );
+        console.log(user.lastOtpReq);
+        console.log(user.otp);
+        return NextResponse.json({ message:"Successfully sent the otp to mail" });
     } catch (e) {
         
         return NextResponse.json({ error: "Failed to send mail" }, { status: 500 });

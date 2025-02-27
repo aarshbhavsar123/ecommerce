@@ -45,7 +45,7 @@ export default function FunctionLoginForm() {
             const response = await axios.post("/api/users/login",user);
             console.log("Signup Success",response.data);
             toast.success("Login Success");
-            router.push("/");
+            router.push("/home");
         }
         catch(e:any)
         {

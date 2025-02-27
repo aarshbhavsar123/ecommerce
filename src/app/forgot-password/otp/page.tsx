@@ -1,7 +1,7 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store"; 
 function Input({ type, id, name, label, placeholder, autofocus, value, onChange }: any) {
@@ -23,8 +23,8 @@ function Input({ type, id, name, label, placeholder, autofocus, value, onChange 
 }
 export default function ForgotPasswordOtp() {
     const router = useRouter();
-    const otp = useSelector((state: RootState) => state.auth.otp); 
-    const [state, setState] = useState({ otp: "" });
+    const email = useSelector((state:RootState)=>state.auth.email);
+    const [state, setState] = useState({ otp: "" ,email:email});
     const [disabled, setDisabled] = useState(true);
     const [loading,setLoading] = useState(false);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,17 +33,18 @@ export default function ForgotPasswordOtp() {
 
     const handleSubmit = async () => {
       
-      console.log(typeof(state.otp));
-      console.log(typeof(otp));
-      console.log(state.otp);
-      console.log(otp);
-
+      
+      try{
         setLoading(true);
-        if (String(otp) === state.otp) {  
-          router.push("/forgot-password/change-password");
-        } else {
-          alert("OTP didn't match");
-          return;
+        const res = await axios.post("/api/users/verify-otp",state);
+        router.push("/forgot-password/change-password")
+      }
+      catch(e)
+      {
+        console.log(e);
+      }
+      finally{
+        setLoading(false);
       }
         
     };

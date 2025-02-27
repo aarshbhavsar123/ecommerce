@@ -33,7 +33,7 @@ export default function ForgotPassword() {
     email: "",
   });
 
-  const [localOtp, setLocalOtp] = useState<string | null>(null); 
+ 
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -49,15 +49,9 @@ export default function ForgotPassword() {
       setLoading(true);
       const response = await axios.post("/api/users/send-otp", user);
       alert(`OTP sent to the email: ${user.email}`);
-
-      if (response.data.otp) {
-        setLocalOtp(response.data.otp); 
-        dispatch(setOtp(response.data.otp)); 
-        dispatch(setEmail(user.email));
-        router.push("/forgot-password/otp");
-      } else {
-        console.error("No OTP received");
-      }
+      dispatch(setEmail(user.email));
+      router.push("/forgot-password/otp");
+      
     } catch (e: any) {
       console.error("Send OTP failed", e.message);
     } finally {
