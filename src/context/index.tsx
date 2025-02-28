@@ -17,7 +17,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
       try {
         const { data } = await axios.get("/api/users/profile");
         setUser(data);
-        console.log("User data fetched:", data);
+        
       } catch (error) {
         console.error("Error fetching user profile:", error);
         setUser(null); 

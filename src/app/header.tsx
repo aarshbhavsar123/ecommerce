@@ -43,7 +43,7 @@ export default function Header() {
     }
   };
   const handleProfileClick = ()=>{
-    console.log(user);
+    
     router.push(`/profile/${user.id}`)
   }
   const toggleMenu = () => {

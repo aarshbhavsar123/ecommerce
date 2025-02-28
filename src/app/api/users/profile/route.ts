@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
    
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET!) as { userId: string };
-    console.log(decoded);
+    
     
     if (!decoded) {
       return NextResponse.redirect(new URL("/login", req.nextUrl));

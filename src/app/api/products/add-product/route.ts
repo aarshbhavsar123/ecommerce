@@ -8,11 +8,16 @@ export async function POST(request: NextRequest) {
     try 
     {
         const reqBody = await request.json();
-        const {product_name,seller_id,price,images} = reqBody;
-        const newProduct = new Product({product_name:product_name,seller_id:seller_id,price:price,images:images});
-        console.log(newProduct);
-        const savedProduct = await newProduct.save();
+        const {product_name,seller_id,price,images,description} = reqBody;
         
+        const savedProduct = await Product.create({
+            product_name,
+            seller_id,
+            price,
+            images,
+            description
+          });
+          console.log(savedProduct);
         return NextResponse.json({message:"completed"});
     } 
     catch(e: any) 

@@ -65,8 +65,7 @@ export async function POST(req: NextRequest) {
                 } 
             }
         );
-        console.log(user.lastOtpReq);
-        console.log(user.otp);
+        
         return NextResponse.json({ message:"Successfully sent the otp to mail" });
     } catch (e) {
         

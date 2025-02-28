@@ -17,7 +17,11 @@ const productSchema = new mongoose.Schema({
         {
             type:String
         }
-    ]
+    ],
+    description:{
+        type:String,
+        required:true
+    }
 }, { timestamps: true });
 
 const Product = mongoose.models.Product || mongoose.model("Product", productSchema);

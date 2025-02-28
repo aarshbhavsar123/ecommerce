@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardMedia, Typography, Box } from "@mui/material";
-
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
 interface ProductCardProps {
   image: string;
   title: string;
   price: number;
+  id: string;
 }
 
 const Button: React.FC<{ onClick: () => void }> = ({ onClick }) => {
@@ -20,25 +21,68 @@ const Button: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   );
 };
 
-const handleClick = () => {
-  alert("Item added to cart!");
-};
-
-const ProductCard: React.FC<ProductCardProps> = ({ image, title, price }) => {
+const ProductCard: React.FC<ProductCardProps> = ({
+  image,
+  title,
+  price,
+  id,
+}) => {
+  const router = useRouter();
+  const handleClick = (id: string) => {
+    router.push(`/product-overview/${id}`);
+  };
   return (
-    <Card sx={{ maxWidth: 265.4499876 , borderRadius: 2, boxShadow: 5, transition: "0.3s", '&:hover': { boxShadow: 10 } }}>
-      <CardMedia component="img" height="200" image={image} alt={title} sx={{ objectFit:"fill"}} />
-      <CardContent>
-        <Typography variant="h6" component="div" sx={{ fontWeight:"bold" }}>
+    <Card
+      sx={{
+        width: 265,
+        height: 400,
+        borderRadius: 2,
+        boxShadow: 5,
+        transition: "0.3s",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        "&:hover": { boxShadow: 10 },
+      }}
+    >
+      <CardMedia
+        component="img"
+        sx={{
+          width: "100%",
+          height: 180,
+          objectFit: "contain",
+          backgroundColor: "#f5f5f5",
+        }}
+        image={image}
+        alt={title}
+      />
+      <CardContent
+        sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+      >
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{
+            fontWeight: "bold",
+            flexGrow: 1,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
           {title}
         </Typography>
-        <Typography variant="h5" color="primary" sx={{ fontWeight: "bold", mb: 1 }}>
+        <Typography
+          variant="h5"
+          color="primary"
+          sx={{ fontWeight: "bold", mb: 1 }}
+        >
           ${price.toFixed(2)}
         </Typography>
-        <Button onClick={handleClick} />
+        <Button onClick={() => handleClick(id)} />
       </CardContent>
     </Card>
   );
 };
 
-export default ProductCard
+export default ProductCard;

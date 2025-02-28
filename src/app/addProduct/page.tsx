@@ -6,11 +6,9 @@ const page = () => {
   const [price, setPrice] = useState("");
   const [images, setImages] = useState([]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e:any) => {
     e.preventDefault();
-    console.log("Product:", product);
-    console.log("Price:", price);
-    console.log("Images:", images);
+    
   };
 
   return (
@@ -42,7 +40,7 @@ const page = () => {
               required
               type="file"
               multiple
-              onChange={(e) => setImages([...e.target.files])}
+              
             />
           </div>
           <div className="w-full flex justify-center">
