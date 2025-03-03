@@ -3,6 +3,7 @@
 import React from "react";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
+
 interface ProductCardProps {
   image: string;
   title: string;
@@ -44,6 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         justifyContent: "space-between",
         "&:hover": { boxShadow: 10 },
       }}
+      onClick={() => handleClick(id)}
     >
       <CardMedia
         component="img"
