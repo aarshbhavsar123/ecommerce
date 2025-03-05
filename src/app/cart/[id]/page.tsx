@@ -9,7 +9,14 @@ import {
   TextField,
   Divider,
   IconButton,
+  Modal,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Radio,
 } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedAddressIndex } from "@/redux/slices/authSlices"; 
 import {
   Delete as DeleteIcon,
   Add as AddIcon,
@@ -23,6 +30,9 @@ const ShoppingCart = () => {
   const { user } = useAppContext();
   const [cartItems, setCartItems] = useState([]);
   const router = useRouter();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [addresses, setAddresses] = useState([]);
+  
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -38,7 +48,6 @@ const ShoppingCart = () => {
     fetchCart();
   }, [user]);
 
-  // Calculate subtotal
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.product.price * item.quantity,
     0
@@ -46,16 +55,12 @@ const ShoppingCart = () => {
   const tax = subtotal * 0.05; // 5% tax
   const total = subtotal + tax;
 
-  const handleDelete = async (product_id: string, event: React.MouseEvent) => {
-    // Stop propagation to prevent triggering the parent onClick
+  const handleDelete = async (product_id, event) => {
     event.stopPropagation();
-    
     if (user) {
       try {
         await axios.post(`/api/cart/remove-items/${user.id}/${product_id}`);
         alert("Item removed successfully");
-
-        // Update state after deletion
         setCartItems((prevItems) =>
           prevItems.filter((item) => item.product._id !== product_id)
         );
@@ -65,18 +70,14 @@ const ShoppingCart = () => {
     }
   };
 
-  const updateQuantity = async (product_id: string, newQuantity: number, event: React.MouseEvent) => {
-    // Stop propagation to prevent triggering the parent onClick
+  const updateQuantity = async (product_id:any, newQuantity:any, event:any) => {
     event.stopPropagation();
-    
     if (user) {
       try {
         await axios.post(`/api/cart/update-quantity/${user.id}/${product_id}`, { quantity: newQuantity });
         setCartItems((prevItems:any) =>
           prevItems.map((item:any) =>
-            item.product._id === product_id
-              ? { ...item, quantity: newQuantity }
-              : item
+            item.product._id === product_id ? { ...item, quantity: newQuantity } : item
           )
         );
       } catch (error) {
@@ -85,11 +86,26 @@ const ShoppingCart = () => {
     }
   };
 
-  const handleItemClick = (productId: string) => {
-    
+  const handleItemClick = (productId:any) => {
     router.push(`/product-overview/${productId}`);
   };
 
+  const proceed = async () => {
+    try {
+      const response = await axios.get(`/api/users/get-addresses/${user.id}`);
+      setAddresses(response.data || []);
+      setModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    }
+  };
+
+  const handleCloseModal = () => setModalOpen(false);
+  const dispatch = useDispatch();
+  const selectedAddressIndex = useSelector((state:any) => state.auth.selectedAddressIndex);
+  const handleSelectAddress = (index:any) => {
+    dispatch(setSelectedAddressIndex(index));
+  };
   return (
     <Box sx={{ backgroundColor: "background.default", py: 8, color: "text.primary" }}>
       <Box sx={{ maxWidth: "screen-xl", mx: "auto", px: 4 }}>
@@ -100,18 +116,18 @@ const ShoppingCart = () => {
         <Grid container spacing={4}>
           {/* Cart Items */}
           <Grid item xs={12} lg={8}>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }} >
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {cartItems.map((item) => (
-                <Paper 
-                  key={item.product._id} 
-                  sx={{ 
-                    p: 3, 
+                <Paper
+                  key={item.product._id}
+                  sx={{
+                    p: 3,
                     cursor: "pointer",
                     transition: "all 0.2s",
-                    "&:hover": { 
+                    "&:hover": {
                       boxShadow: 6,
-                      transform: "translateY(-2px)" 
-                    } 
+                      transform: "translateY(-2px)",
+                    },
                   }}
                   onClick={() => handleItemClick(item.product._id)}
                 >
@@ -144,11 +160,7 @@ const ShoppingCart = () => {
                     </Grid>
                     <Grid item xs={12} md={2}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <IconButton 
-                          size="small" 
-                          disableRipple 
-                          onClick={(e) => updateQuantity(item.product._id, Math.max(1, item.quantity - 1), e)}
-                        >
+                        <IconButton size="small" disableRipple onClick={(e) => updateQuantity(item.product._id, Math.max(1, item.quantity - 1), e)}>
                           <RemoveIcon />
                         </IconButton>
                         <TextField
@@ -157,11 +169,7 @@ const ShoppingCart = () => {
                           sx={{ width: 60, textAlign: "center" }}
                           inputProps={{ style: { textAlign: "center" }, readOnly: true }}
                         />
-                        <IconButton 
-                          size="small" 
-                          disableRipple 
-                          onClick={(e) => updateQuantity(item.product._id, item.quantity + 1, e)}
-                        >
+                        <IconButton size="small" disableRipple onClick={(e) => updateQuantity(item.product._id, item.quantity + 1, e)}>
                           <AddIcon />
                         </IconButton>
                       </Box>
@@ -202,13 +210,63 @@ const ShoppingCart = () => {
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>${total.toFixed(2)}</Typography>
               </Box>
 
-              <Button variant="contained" color="primary" fullWidth sx={{ py: 1.5, fontSize: "16px", fontWeight: "bold" }} disableRipple>
+              <Button variant="contained" color="primary" fullWidth sx={{ py: 1.5, fontSize: "16px", fontWeight: "bold" }} disableRipple onClick={proceed}>
                 Proceed to Checkout
               </Button>
             </Paper>
           </Grid>
         </Grid>
       </Box>
+
+      <Modal
+  open={modalOpen}
+  onClose={handleCloseModal}
+  aria-labelledby="modal-title"
+  aria-describedby="modal-description"
+>
+  <Box
+    sx={{
+      position: "fixed",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: 400,
+      bgcolor: "background.paper",
+      boxShadow: 24,
+      p: 4,
+      borderRadius: 2,
+      outline: "none", 
+    }}
+  >
+    <Typography id="modal-title" variant="h6" sx={{ mb: 2 }}>
+      Select Your Address
+    </Typography>
+    <FormGroup>
+      {addresses.map((address, index) => (
+        <FormControlLabel
+          key={index}
+          control={
+            <Radio
+              checked={selectedAddressIndex === index}
+              onChange={() => handleSelectAddress(index)} // ✅ Corrected here
+            />
+          }
+          label={address}
+        />
+      ))}
+    </FormGroup>
+    <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+      <Button onClick={handleCloseModal} sx={{ mr: 1 }}>
+        Cancel
+      </Button>
+      <Button variant="contained" color="primary" onClick={()=>router.push("/order-summary?cart=1")}>
+        Confirm Address
+      </Button>
+    </Box>
+  </Box>
+</Modal>
+
+
     </Box>
   );
 };

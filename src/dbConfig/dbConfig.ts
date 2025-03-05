@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+
+import { PrismaClient } from "@prisma/client";
+export const prisma = new PrismaClient();
 export async function connect()
 {
     try{
@@ -17,3 +20,4 @@ export async function connect()
          console.log(e);
     }
 }
+

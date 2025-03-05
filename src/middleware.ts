@@ -19,6 +19,10 @@ export function middleware(request: NextRequest)
     {
       return NextResponse.redirect(new URL("/",request.nextUrl));
     }
+    if(path=="/")
+    {
+        return NextResponse.redirect(new URL("/home",request.nextUrl));
+    }
 }
  
 export const config = {
