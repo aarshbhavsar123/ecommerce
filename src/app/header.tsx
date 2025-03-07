@@ -31,7 +31,7 @@ export default function Header() {
     if (user) {
       fetchCartData();
     }
-  }, [user]);
+  }, []);
 
   const fetchCartData = async () => {
     try {
@@ -221,7 +221,7 @@ export default function Header() {
                 Add Your Address
               </Typography>
 
-              {/* Address Input Field */}
+             
               <TextareaAutosize
                 minRows={4}
                 placeholder="Enter your full address here..."
@@ -230,7 +230,7 @@ export default function Header() {
                 style={{ width: '100%', marginTop: '16px', padding: '8px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px' }}
               />
 
-              {/* Modal Action Buttons */}
+             
               <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
                 <Button onClick={handleCloseModal} sx={{ mr: 1 }}>
                   Cancel

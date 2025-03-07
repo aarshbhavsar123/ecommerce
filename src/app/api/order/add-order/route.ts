@@ -3,6 +3,7 @@
     import { NextRequest, NextResponse } from "next/server";
     import { prisma } from "@/dbConfig/dbConfig";
     import Cart from "@/models/cartSchema";
+    
 
     connect();
 
@@ -21,7 +22,7 @@
             include: { items: true }
         });
 
-        console.log("Order Created:", order);
+        // console.log("Order Created:", order);
         
 
         return order;
@@ -34,14 +35,14 @@
                 items: {
                     create: products.map((product: any) => ({
                         product_id: product.product._id, 
-                        quantity:product.product.quantity
+                        quantity:product.quantity
                     }))
                 }
             },
             include: { items: true }
         });
 
-        console.log("Order Created:", order);
+        // console.log("Order Created:", order);
         
 
         return order;
@@ -50,26 +51,23 @@
         try {
             var { userId, address, cart, quantity } = await request.json();
             
-            console.log(quantity);
             if(quantity)
             {
-                
                 await createOrder1(userId, address, cart, parseInt(quantity,10));
-                
             }
-            else
+            else if(!quantity)
             {
+                // console.log(cart);
                 await createOrder2(userId,address,cart);
                 await Cart.findOneAndUpdate(
                     { owner_id: userId },
                     { $set: { products: [] } },
-                    
                 );
             }
-            
             return NextResponse.json({ message: "Success" });
         } 
-        catch (e: any) {
+        catch (e: any) 
+        {
             console.log(e.message);
             return NextResponse.json({ message: "Error" }, { status: 400 });
         }

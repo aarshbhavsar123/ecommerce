@@ -48,12 +48,12 @@ const Cards: React.FC = () => {
   return (
     <Box padding={4}>
       <Grid container spacing={4}>
-        {/* Filters on the left side */}
+       
         <Grid item xs={12} sm={4} md={3}>
           <Filters brands={brands} onFilter={handleFilter} />
         </Grid>
 
-        {/* Product cards on the right side */}
+        
         <Grid item xs={12} sm={8} md={9}>
           <Box display="flex" flexWrap="wrap" justifyContent="flex-start" gap={4}>
             {filteredProducts.map((product) => (

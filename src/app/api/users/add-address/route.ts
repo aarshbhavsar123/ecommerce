@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         if (!user) {
             return NextResponse.json({ message: "User not found" }, { status: 404 });
         }
-        console.log(user);
+        // console.log(user);
         return NextResponse.json({ message: "Address added successfully", user });
     } catch (e: any) {
         console.error("Error updating user:", e);

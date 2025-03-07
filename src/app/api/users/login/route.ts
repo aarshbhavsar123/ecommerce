@@ -49,7 +49,7 @@ export async function POST(request:NextRequest)
                     role:user.isAdmin,
                     addresses:user.addresses
                 }
-                console.log(user);
+                // console.log(user);
                 const token = await jwt.sign(tokenData,process.env.TOKEN_SECRET!,{expiresIn:"1d"});
                 const response = NextResponse.json({
                     message:"Login Successful",

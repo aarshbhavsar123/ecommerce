@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
             } else {
                 cart.products.push({ product, quantity }); 
             }
-            console.log(cart.products);
+            // console.log(cart.products);
             await cart.save();
             return NextResponse.json({ message: "Cart updated successfully", cart }, { status: 200 });
         } else {

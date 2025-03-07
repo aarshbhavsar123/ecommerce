@@ -28,51 +28,47 @@ const Button: React.FC<{ onClick: () => void; children: React.ReactNode; variant
 const Cards: React.FC = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [brands, setBrands] = useState([]);
+  
   const [drawerOpen, setDrawerOpen] = useState(false);
   
-  // Filter states
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedBrands, setSelectedBrands] = useState([]);
-
+  const brands = ["Samsung","Apple","Xiaomi","Nothing","Nokia","Oppo","Vivo","Realme"];
   useEffect(() => {
     async function fetchProducts() {
-      const f = async()=>{
-        try{
-          const response = await axios.get(`/api/products/get-products?min=${priceRange[0]}&max=${priceRange[1]}`);
-          setFilteredProducts(response.data);
-        }
-        catch(e)
-        {
-          console.error(e);
-        }
-  
+      try {
+        const response = await axios.get("/api/products/get-products");
+    
+        setFilteredProducts(response.data);
+      } catch (e) {
+        console.error(e);
       }
-      f();
+    
       setDrawerOpen(false);
     }
-
     fetchProducts();
   }, []);
 
-  // Apply filters function
-  const applyFilters = () => {
-    
-    const f = async()=>{
-      try{
-        const response = await axios.get(`/api/products/get-products?min=${priceRange[0]}&max=${priceRange[1]}`);
-        setFilteredProducts(response.data);
-        alert("Filtered Successfully");
-      }
-      catch(e)
-      {
-        console.error(e);
-      }
-
+ 
+  const applyFilters = async () => {
+    try {
+      const response = await axios.get(`/api/products/get-products`, {
+        params: {
+          min: priceRange[0],
+          max: priceRange[1],
+          selectedBrands: JSON.stringify(selectedBrands), 
+        },
+      });
+  
+      setFilteredProducts(response.data);
+      alert("Filtered Successfully");
+    } catch (e) {
+      console.error(e);
     }
-    f();
+  
     setDrawerOpen(false);
   };
+
 
   // Handle brand selection
   const handleBrandChange = (brand) => {
@@ -93,14 +89,14 @@ const Cards: React.FC = () => {
     setDrawerOpen(false);
   };
 
-  // Handle card click
+  
   const handleCardClick = (product:any) => {
     console.log(product);
   };
-
+  
   return (
     <Box>
-      {/* Filter Button with Hamburger Icon */}
+      
       <Box display="flex" justifyContent="flex-start" px={4} py={2}>
         <button
           onClick={() => setDrawerOpen(true)}
@@ -110,7 +106,7 @@ const Cards: React.FC = () => {
         </button>
       </Box>
 
-      {/* Filter Drawer */}
+      
       <Drawer
         anchor="left"
         open={drawerOpen}
@@ -121,7 +117,7 @@ const Cards: React.FC = () => {
             Filter Products
           </Typography>
           
-          {/* Price Range Filter */}
+          
           <Box mt={3}>
             <Typography id="price-range-slider" gutterBottom>
               Price Range
@@ -155,7 +151,7 @@ const Cards: React.FC = () => {
             </Box>
           </Box>
           
-          {/* Brand Filter */}
+         
           <Box mt={4}>
             <Typography gutterBottom>Brands</Typography>
             <FormGroup>
@@ -174,13 +170,9 @@ const Cards: React.FC = () => {
             </FormGroup>
           </Box>
           
-          {/* Action Buttons */}
-          <Box mt={4} display="flex" justifyContent="space-between" gap={2}>
-            <Box className="w-1/2">
-              <Button onClick={resetFilters} variant="outline">
-                Reset
-              </Button>
-            </Box>
+          
+          <Box mt={4} display="flex" justifyContent="center" gap={2}>
+            
             <Box className="w-1/2">
               <Button onClick={applyFilters}>
                 Apply
@@ -190,7 +182,7 @@ const Cards: React.FC = () => {
         </Box>
       </Drawer>
 
-      {/* Products Grid */}
+      
       <Box display="flex" flexWrap="wrap" justifyContent="between" gap={4} padding={4}>
         {filteredProducts.map((product, index) => (
           <ProductCard

@@ -49,6 +49,7 @@ const ShoppingCart = () => {
   }, [user]);
 
   const subtotal = cartItems.reduce(
+    
     (acc, item) => acc + item.product.price * item.quantity,
     0
   );
@@ -114,12 +115,12 @@ const ShoppingCart = () => {
         </Typography>
 
         <Grid container spacing={4}>
-          {/* Cart Items */}
+         
           <Grid item xs={12} lg={8}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {cartItems.map((item) => (
                 <Paper
-                  key={item.product._id}
+                  key={item.product?._id}
                   sx={{
                     p: 3,
                     cursor: "pointer",
@@ -185,7 +186,7 @@ const ShoppingCart = () => {
             </Box>
           </Grid>
 
-          {/* Checkout Box */}
+       
           <Grid item xs={12} lg={4}>
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 3 }}>
               <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
@@ -248,7 +249,7 @@ const ShoppingCart = () => {
           control={
             <Radio
               checked={selectedAddressIndex === index}
-              onChange={() => handleSelectAddress(index)} // ✅ Corrected here
+              onChange={() => handleSelectAddress(index)} 
             />
           }
           label={address}
@@ -259,7 +260,13 @@ const ShoppingCart = () => {
       <Button onClick={handleCloseModal} sx={{ mr: 1 }}>
         Cancel
       </Button>
-      <Button variant="contained" color="primary" onClick={()=>router.push("/order-summary?cart=1")}>
+      <Button variant="contained" color="primary" onClick={()=>
+        {
+          router.push("/order-summary?cart=1");
+          if(selectedAddressIndex)
+          localStorage.setItem("address",JSON.stringify(addresses[selectedAddressIndex]));
+        }}
+        >
         Confirm Address
       </Button>
     </Box>
