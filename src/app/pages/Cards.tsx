@@ -1,7 +1,7 @@
 "use client";
 import ProductCard from "@/components/Card";
 import { 
-  Box, Drawer, Typography, Slider, TextField, Checkbox, FormGroup, FormControlLabel,
+  Box, Drawer, Typography, Slider, Checkbox, FormGroup, FormControlLabel,
   Select, MenuItem, Pagination 
 } from "@mui/material";
 import { useState, useEffect } from "react";
@@ -30,85 +30,65 @@ const Button: React.FC<{ onClick: () => void; children: React.ReactNode; variant
 
 const Cards: React.FC = () => {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [selectedBrands, setSelectedBrands] = useState([]);
-  const [sortOrder, setSortOrder] = useState(""); // Sorting state
-
-  // Pagination states
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [sortOrder, setSortOrder] = useState(""); 
+  const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10; 
 
   const brands = ["Samsung", "Apple", "Xiaomi", "Nothing", "Nokia", "Oppo", "Vivo", "Realme"];
 
+  // Fetch products only when relevant state changes
   useEffect(() => {
-    async function fetchProducts() {
+    const fetchProducts = async () => {
       try {
-        const response = await axios.get("/api/products/get-products");
-        setProducts(response.data);
-        setFilteredProducts(response.data);
+        const response = await axios.get("/api/products/get-products", {
+          params: {
+            min: priceRange[0],
+            max: priceRange[1],
+            selectedBrands: JSON.stringify(selectedBrands), 
+            order: sortOrder, // Ensure API uses 'order' instead of 'sortOrder'
+            page: currentPage, 
+            productsPerPage
+          }
+        });
+        setProducts(response.data.products);
+        setTotalPages(Math.ceil(response.data.totalProducts / productsPerPage));
       } catch (e) {
         console.error(e);
       }
-      setDrawerOpen(false);
-    }
-    fetchProducts();
-  }, []);
+    };
 
-  const applyFilters = async () => {
-    try {
-      const response = await axios.get(`/api/products/get-products`, {
-        params: {
-          min: priceRange[0],
-          max: priceRange[1],
-          selectedBrands: JSON.stringify(selectedBrands), 
-          sortOrder
-        },
-      });
-      setFilteredProducts(response.data);
-      setCurrentPage(1); 
-    } catch (e) {
-      console.error(e);
-    }
-    setDrawerOpen(false);
+    fetchProducts();
+  }, [currentPage, priceRange, selectedBrands, sortOrder]); // ✅ Dependencies for single fetch call
+
+  // Apply filters
+  const applyFilters = () => {
+    setCurrentPage(1);
   };
 
-  // Handle sorting with backend API
-  const handleSortChange = async (event:any) => {
-    const order = event.target.value;
-    setSortOrder(order);
-    
-    try {
-      const response = await axios.get(`/api/products/get-products`, {
-
-        params: { order,min:priceRange[0],max:priceRange[1],selectedBrands: JSON.stringify(selectedBrands) },
-      });
-      setFilteredProducts(response.data);
-      setCurrentPage(1); 
-    } catch (e) {
-      console.error(e);
-    }
+  // Handle sorting change
+  const handleSortChange = (event: any) => {
+    setSortOrder(event.target.value);
+    setCurrentPage(1);
   };
 
   // Handle brand selection
-  const handleBrandChange = (brand:any) => {
-    setSelectedBrands((prev:any) => prev.includes(brand) ? prev.filter((b:any) => b !== brand) : [...prev, brand]);
+  const handleBrandChange = (brand: string) => {
+    setSelectedBrands((prev) => 
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
+    );
   };
 
   // Reset filters
   const resetFilters = () => {
     setPriceRange([0, 1000]);
     setSelectedBrands([]);
-    setFilteredProducts(products);
+    setSortOrder("");
     setCurrentPage(1);
-    setDrawerOpen(false);
   };
-
-  // Get current products for pagination
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
   return (
     <Box>
@@ -150,7 +130,7 @@ const Cards: React.FC = () => {
             </Typography>
             <Slider
               value={priceRange}
-              onChange={(_, newValue) => setPriceRange(newValue)}
+              onChange={(_, newValue) => setPriceRange(newValue as number[])}
               valueLabelDisplay="auto"
               min={0}
               max={1000}
@@ -190,8 +170,8 @@ const Cards: React.FC = () => {
       </Drawer>
 
       {/* 🔹 Products Grid */}
-      <Box display="flex" flexWrap="wrap" justifyContent="between" gap={4} padding={4}>
-        {currentProducts.map((product, index) => (
+      <Box display="flex" flexWrap="wrap" justifyContent="between" gap={2} padding={2}>
+        {products.map((product, index) => (
           <ProductCard
             key={index}
             image={product.images?.[0] || "/default-image.jpg"}
@@ -205,7 +185,7 @@ const Cards: React.FC = () => {
       {/* 🔹 Pagination */}
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
-          count={Math.ceil(filteredProducts.length / productsPerPage)}
+          count={totalPages}
           page={currentPage}
           onChange={(_, value) => setCurrentPage(value)}
           color="primary"

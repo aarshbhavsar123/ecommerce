@@ -13,6 +13,11 @@ export async function GET(request: NextRequest) {
         let selectedBrands = searchParams.get("selectedBrands") || "[]";
         selectedBrands = JSON.parse(selectedBrands);
 
+        // Pagination parameters
+        const page = parseInt(searchParams.get("page") || "1");
+        const productsPerPage = parseInt(searchParams.get("productsPerPage") || "10");
+        const skip = (page - 1) * productsPerPage; // Calculate number of documents to skip
+
         const filter: any = {
             price: { $gte: minPrice, $lte: maxPrice },
         };
@@ -21,13 +26,26 @@ export async function GET(request: NextRequest) {
             filter.brand = { $in: selectedBrands };
         }
 
-        
-        const sortOption: any = order === "asc" ? { product_name: 1 } : { product_name: -1 };
+        const sortOrder = order === "asc" ? 1 : -1;
 
-        const products = await Product.find(filter).sort(sortOption);
-        
-        return NextResponse.json(products);
+        const products = await Product.aggregate([
+            { $match: filter },
+            { 
+                $addFields: { 
+                    capitalizedName: { $toUpper: "$product_name" } 
+                } 
+            },
+            { $sort: { capitalizedName: sortOrder } },
+            { $skip: skip },  // Skip documents based on pagination
+            { $limit: productsPerPage },  // Limit results per page
+        ]);
+
+        // Count total products (for pagination UI)
+        const totalProducts = await Product.countDocuments(filter);
+
+        return NextResponse.json({ products, totalProducts });
     } catch (e: any) {
         return NextResponse.json({ message: "Error fetching products" }, { status: 500 });
     }
 }
+        
