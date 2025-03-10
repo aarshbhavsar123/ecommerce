@@ -28,17 +28,20 @@ import { Router } from "next/router";
 const Orders = () => {
   const { user, setUser } = useAppContext();
   const [orders, setOrders] = useState([]);
-  const handleOrders = () => {
-    const f = async () => {
-      try {
-        const response = await axios.get(`/api/order/get-orders/${user.id}`);
-        setOrders(response.data);
-      } catch (e: any) {
-        console.log(e.message);
-      }
-    };
-    f();
+  const [reload,setReload] = useState(true);
+  const f = async () => {
+    try {
+      const response = await axios.get(`/api/order/get-orders/${user.id}`);
+      setOrders(response.data);
+      setReload(!reload);
+    } catch (e: any) {
+      console.log(e.message);
+    }
   };
+  // const handleOrders = () => {
+    
+  //   f();
+  // };
   const handleCancel = (orderId: any) => {
     const f = async () => {
       try {
@@ -50,7 +53,7 @@ const Orders = () => {
     };
     f();
   };
-  useEffect(handleOrders, [user]);
+  useEffect(()=>{f();}, [reload]);
   console.log(orders);
   const router = useRouter();
   return (
