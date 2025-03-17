@@ -9,6 +9,7 @@ import axios from "axios";
 import MenuIcon from '@mui/icons-material/Menu';
 
 // Custom Button component
+
 const Button: React.FC<{ onClick: () => void; children: React.ReactNode; variant?: 'primary' | 'outline' }> = ({ 
   onClick, 
   children, 
@@ -49,7 +50,7 @@ const Cards: React.FC = () => {
             min: priceRange[0],
             max: priceRange[1],
             selectedBrands: JSON.stringify(selectedBrands), 
-            order: sortOrder, // Ensure API uses 'order' instead of 'sortOrder'
+            order: sortOrder, 
             page: currentPage, 
             productsPerPage
           }
@@ -62,11 +63,12 @@ const Cards: React.FC = () => {
     };
 
     fetchProducts();
-  }, [currentPage, priceRange, selectedBrands, sortOrder]); // ✅ Dependencies for single fetch call
+  }, [currentPage, priceRange, selectedBrands, sortOrder]); 
 
   // Apply filters
   const applyFilters = () => {
     setCurrentPage(1);
+    setDrawerOpen(false);
   };
 
   // Handle sorting change
@@ -89,7 +91,7 @@ const Cards: React.FC = () => {
     setSortOrder("");
     setCurrentPage(1);
   };
-
+  
   return (
     <Box>
 

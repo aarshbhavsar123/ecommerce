@@ -95,8 +95,31 @@ const ProductInfo = () => {
         }
       }
     };
+  
+    const addRecent = async () => {
+      if (typeof window !== "undefined") {
+        const pathParts = window.location.pathname.split("/");
+        const id = pathParts[pathParts.length - 1];
+  
+        try {
+          if (!user || !user.id) return; 
+  
+          await axios.post(`/api/products/add-recent`, {
+            productId: id,
+            userId: user.id,
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    };
+  
     fetchData();
-  }, []);
+    addRecent();
+  
+    
+  }, []); 
+  
 
   const handleIncrease = () => {
     setQuantity((prev) => prev + 1);

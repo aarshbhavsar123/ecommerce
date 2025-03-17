@@ -12,12 +12,13 @@ export async function GET(request: NextRequest) {
         const order = searchParams.get("order") || "";
         let selectedBrands = searchParams.get("selectedBrands") || "[]";
         selectedBrands = JSON.parse(selectedBrands);
-
+        
         // Pagination parameters
         const page = parseInt(searchParams.get("page") || "1");
-        const productsPerPage = parseInt(searchParams.get("productsPerPage") || "10");
-        const skip = (page - 1) * productsPerPage; // Calculate number of documents to skip
+        const productsPerPage = Number(searchParams.get("productsPerPage") || "10");
 
+        const skip = (page - 1) * productsPerPage; // Calculate number of documents to skip
+        
         const filter: any = {
             price: { $gte: minPrice, $lte: maxPrice },
         };

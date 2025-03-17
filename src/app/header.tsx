@@ -83,7 +83,9 @@ export default function Header() {
 
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
-
+  const handleRecent = ()=>{
+    router.push(`/recently-viewed/${user.id}`)
+  }
   const handleSaveAddress = async () => {
     try {
       if (!user || !user.id) {
@@ -153,6 +155,9 @@ export default function Header() {
                   }}>Login</button>
                 )}
               </li>
+              <li>
+                {user? (<button onClick={handleRecent}>Recent</button>):(<></>)}
+              </li>
               {user && (
                 <li className="md:ml-60">
                   <button className="hover:text-[#add8e6]" onClick={handleProfileClick}>
@@ -160,6 +165,7 @@ export default function Header() {
                   </button>
                 </li>
               )}
+              
             </ul>
           </nav>
 

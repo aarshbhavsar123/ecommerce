@@ -30,6 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const router = useRouter();
   const handleClick = (id: string) => {
+    
     router.push(`/product-overview/${id}`);
   };
   return (
