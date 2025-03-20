@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         }
 
         const currentTime = new Date();
-        const twoDaysInMs = 2 * 24 * 60 * 60 * 1000;
+        const twoDaysInMs = 5 * 24 * 60 * 60 * 1000;
 
         
         const filteredProducts = recent.products.filter((product: any) => {

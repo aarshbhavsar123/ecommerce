@@ -10,6 +10,7 @@ const Button: React.FC<{ onClick: () => void; children: React.ReactNode; variant
   variant = 'primary' 
 }) => {
   return (
+    
     <button
       onClick={onClick}
       className={`transition-all py-3 px-4 w-full font-bold rounded focus:outline-none focus:ring-2 focus:ring-blue-400 transform hover:-translate-y-1 hover:shadow-lg ${
@@ -51,7 +52,9 @@ const Cards: React.FC = () => {
    
   
   return (
-    <Box>
+    <div>
+      
+        <Box>
       <Box display="flex" flexWrap="wrap" justifyContent="between" gap={2} padding={2}>
         {products.map((product, index) => (
           <ProductCard
@@ -63,16 +66,11 @@ const Cards: React.FC = () => {
           />
         ))}
       </Box>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={(_, value) => setCurrentPage(value)}
-          color="primary"
-        />
-      </Box>
+      
 
     </Box>
+    </div>
+    
   );
 };
 

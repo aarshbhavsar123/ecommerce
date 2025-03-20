@@ -36,12 +36,20 @@ const Cards: React.FC = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState(""); 
   const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(() => {
+    const savedPage = localStorage.getItem("currentPage");
+    return savedPage ? parseInt(savedPage, 10) : 1;
+  });
+  
   const productsPerPage = 10; 
 
   const brands = ["Samsung", "Apple", "Xiaomi", "Nothing", "Nokia", "Oppo", "Vivo", "Realme"];
 
   // Fetch products only when relevant state changes
+  useEffect(() => {
+    localStorage.setItem("currentPage", currentPage.toString());
+  }, [currentPage]);
+  
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -68,7 +76,7 @@ const Cards: React.FC = () => {
   // Apply filters
   const applyFilters = () => {
     setCurrentPage(1);
-    setDrawerOpen(false);
+    
   };
 
   // Handle sorting change
@@ -151,7 +159,7 @@ const Cards: React.FC = () => {
                   control={
                     <Checkbox 
                       checked={selectedBrands.includes(brand)}
-                      onChange={() => handleBrandChange(brand)}
+                      onChange={() => {handleBrandChange(brand)}}
                     />
                   }
                   label={brand}
@@ -161,13 +169,7 @@ const Cards: React.FC = () => {
           </Box>
 
           {/* 🔹 Apply Filters Button */}
-          <Box mt={4} display="flex" justifyContent="center" gap={2}>
-            <Box className="w-1/2">
-              <Button onClick={applyFilters}>
-                Apply
-              </Button>
-            </Box>
-          </Box>
+          
         </Box>
       </Drawer>
 

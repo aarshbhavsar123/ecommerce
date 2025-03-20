@@ -1,11 +1,11 @@
 "use client";
 
 import { useAppContext } from "@/context";
-import { Card, CardContent, Typography, Avatar, Grid, Divider } from "@mui/material";
+import { Button, Card, CardContent, Typography, Avatar, Grid, Divider } from "@mui/material";
 
 export default function Profile({ params }: any) {
   const { user } = useAppContext();
-
+  console.log(user);
   if (!user) {
     return <Typography>Loading...</Typography>;
   }
@@ -45,7 +45,16 @@ export default function Profile({ params }: any) {
             <Divider style={{ margin: "10px 0", backgroundColor: "#1976d2" }} />
             
             <Typography variant="h6" style={{ color: "#1976d2" }}>Role</Typography>
-            <Typography color="textSecondary">{user?.isAdmin?"Admin":"User"}</Typography>   
+            <Typography color="textSecondary">{user?.isAdmin?"Admin":"User"}</Typography>
+            <Divider style={{ margin: "10px 0", backgroundColor: "#1976d2" }} />
+            
+            <Typography variant="h6" style={{ color: "#1976d2" }}>Default Address</Typography>
+            <Typography color="textSecondary">{user?.addresses[0]}</Typography>
+            <Divider style={{ margin: "10px 0", backgroundColor: "#1976d2" }} />
+
+            
+            <Button className="text-blue border-blue">Add Address</Button>
+
           </CardContent>
         </Card>
       </Grid>
