@@ -105,8 +105,10 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
+      
       await axios.get("/api/users/logout");
       setUser(null);
+      localStorage.clear();
       router.push("/login");
     } catch (e) {
       console.log(e.message);
@@ -323,94 +325,94 @@ export default function Header() {
             )}
           </div>
           <Modal open={modalOpen} onClose={handleCloseModal}>
-  <Box
-    sx={{
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      width: 400,
-      bgcolor: "background.paper",
-      boxShadow: 24,
-      p: 4,
-      borderRadius: "4px",
-      position: "relative",
-    }}
-  >
-    <Button
-      onClick={handleCloseModal}
-      sx={{
-        position: "absolute",
-        right: 8,
-        top: 8,
-        minWidth: "auto",
-        p: 1,
-        color: "grey.700",
-        '&:hover': {
-          bgcolor: "grey.200",
-          color: "grey.900",
-        },
-        zIndex: 1,
-      }}
-      aria-label="Close modal"
-    >
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M18 6L6 18"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M6 6L18 18"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </Button>
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                borderRadius: "4px",
+                position: "relative",
+              }}
+            >
+              <Button
+                onClick={handleCloseModal}
+                sx={{
+                  position: "absolute",
+                  right: 8,
+                  top: 8,
+                  minWidth: "auto",
+                  p: 1,
+                  color: "grey.700",
+                  '&:hover': {
+                    bgcolor: "grey.200",
+                    color: "grey.900",
+                  },
+                  zIndex: 1,
+                }}
+                aria-label="Close modal"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18 6L6 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M6 6L18 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Button>
 
-    <Typography variant="h6" sx={{ mb: 2, pr: 4 }}>
-      Add Your Address
-    </Typography>
+              <Typography variant="h6" sx={{ mb: 2, pr: 4 }}>
+                Add Your Address
+              </Typography>
 
-    <TextareaAutosize
-      minRows={4}
-      placeholder="Enter your full address here..."
-      value={address}
-      onChange={(e) => setAddress(e.target.value)}
-      style={{
-        width: "100%",
-        marginTop: "16px",
-        padding: "8px",
-        fontSize: "14px",
-        border: "1px solid #ccc",
-        borderRadius: "4px",
-      }}
-    />
+              <TextareaAutosize
+                minRows={4}
+                placeholder="Enter your full address here..."
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                style={{
+                  width: "100%",
+                  marginTop: "16px",
+                  padding: "8px",
+                  fontSize: "14px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
+              />
 
-    <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-      <Button onClick={handleCloseModal} sx={{ mr: 1 }}>
-        Cancel
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSaveAddress}
-      >
-        Save Address
-      </Button>
-    </Box>
-  </Box>
-</Modal>
+              <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+                <Button onClick={handleCloseModal} sx={{ mr: 1 }}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSaveAddress}
+                >
+                  Save Address
+                </Button>
+              </Box>
+            </Box>
+          </Modal>
         </div>
       </header>
     </>

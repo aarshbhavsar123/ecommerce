@@ -29,7 +29,7 @@ const Cards: React.FC = () => {
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  
+  const [recommendedProducts,setRecommendedProducts] = useState([]);
   const productsPerPage = 10; 
   useEffect(() => {
     if (!user?.id) return; 
@@ -50,25 +50,65 @@ const Cards: React.FC = () => {
     fetchProducts();
   }, [currentPage, user?.id]);  
    
-  
+  useEffect(()=>{
+    if(!user?.id)
+      return;
+    const fetchSimilarProducts = async()=>{
+      try
+      {
+        const response = await axios.get(`/api/products/get-similar`,{
+          params:
+          {
+            userId:user.id
+          }
+        })
+        setRecommendedProducts(response.data.products);
+
+      }
+      catch(e)
+      {
+        console.error(e);
+      }
+    }
+    fetchSimilarProducts();
+  },[currentPage, user?.id]);
   return (
     <div>
-      
+        <div className="mt-6 ml-8">
+        <h2 className="text-2xl font-bold mb-6">Products viewed by you</h2>  
+      </div>
         <Box>
-      <Box display="flex" flexWrap="wrap" justifyContent="between" gap={2} padding={2}>
-        {products.map((product, index) => (
-          <ProductCard
-            key={index}
-            image={product.images?.[0] || "/default-image.jpg"}
-            title={product.product_name}
-            price={product.price}
-            id={product._id}
-          />
-        ))}
-      </Box>
+          <Box display="flex" flexWrap="wrap" justifyContent="between" gap={2} padding={2}>
+            {products.map((product, index) => (
+              <ProductCard
+                key={index}
+                image={product.images?.[0] || "/default-image.jpg"}
+                title={product.product_name}
+                price={product.price}
+                id={product._id}
+              />
+            ))}
+          </Box>
       
-
-    </Box>
+      </Box>
+      <div className="mt-6 ml-8">
+        <h2 className="text-2xl font-bold mb-6">You may also like</h2>  
+      </div>
+      <Box display="flex" flexWrap="wrap" justifyContent="between" gap={2} padding={2}>
+          {recommendedProducts.map((product, index) => (
+            <ProductCard
+              key={index}
+              image={product.images?.[0] || "/default-image.jpg"}
+              title={product.product_name}
+              price={product.price}
+              id={product._id}
+            />
+          ))}
+        </Box>
+      
+      
+    
+    
     </div>
     
   );

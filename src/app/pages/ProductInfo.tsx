@@ -14,6 +14,7 @@ import {
   FormGroup,
   FormControlLabel,
   Radio,
+  TextareaAutosize
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -54,10 +55,12 @@ const CustomNextArrow = (props) => {
 
 const ProductInfo = () => {
   const [product, setProduct] = useState(null);
-  
+  const [address, setAddress] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [modal1Open,setModal1Open] = useState(false);
   const [addresses, setAddresses] = useState([]);
-  
+  const [overallRating,setOverallRating] = useState(0);
+  const [noOfReviews,setNoOfReviews] = useState(0);
   const { user } = useAppContext();
   const selectedAddressIndex = useSelector(
     (state: any) => state.auth.selectedAddressIndex
@@ -116,9 +119,46 @@ const ProductInfo = () => {
   
     fetchData();
     addRecent();
-  
+    
     
   }, []); 
+  const handleSaveAddress = async () => {
+    try {
+      if (!user || !user.id) {
+        console.error("User not logged in");
+        return;
+      }
+
+      const response = await axios.post("/api/users/add-address", {
+        userId: user.id,
+        address: address,
+      });
+
+      alert("Successfully added the address");
+    } catch (error) {
+      console.error("Error saving address:", error);
+      alert("An error occurred while saving the address.");
+    }
+  };
+  useEffect(() => {
+    const fetchRatings = async () => {
+      const pathParts = window.location.pathname.split("/");
+      const productId = pathParts[pathParts.length - 1];
+  
+      try {
+        const response = await axios.get("/api/ratings/get-overall-ratings", {
+          params: { productId }
+        });
+        console.log(response.data.length);
+        setOverallRating(response.data.avg); 
+        setNoOfReviews(response.data.length);
+      } catch (error) {
+        console.error("Error fetching ratings:", error);
+      }
+    };
+  
+    fetchRatings();
+  }, [product]);
   
 
   const handleIncrease = () => {
@@ -132,7 +172,8 @@ const handleDecrease = () => {
 };
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
-  
+  const handleOpenModal1 = () => setModal1Open(true);
+  const handleCloseModal1 = () => setModal1Open(false);
 
   const settings = {
     dots: true,
@@ -229,24 +270,25 @@ const handleDecrease = () => {
           </Typography>
 
           <Grid container alignItems="center" spacing={1}>
-            <Grid item>
-              <Rating value={4.5} readOnly />
-            </Grid>
-            <Grid item>
-              <Typography variant="body2" color="textSecondary">
-                (5.0)
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography
-                variant="body2"
-                color="primary"
-                sx={{ textDecoration: "underline", cursor: "pointer" }}
-              >
-                345 Reviews
-              </Typography>
-            </Grid>
-          </Grid>
+                <Grid item>
+                  <Rating value={overallRating} readOnly precision={0.01} />
+                </Grid>
+                <Grid item>
+                  <Typography variant="body2" color="textSecondary">
+                    ({overallRating.toFixed(2)})
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography
+                    variant="body2"
+                    color="primary"
+                    sx={{ textDecoration: "underline", cursor: "pointer" }}
+                  >
+                    {noOfReviews} Reviews
+                  </Typography>
+                </Grid>
+              </Grid>
+
 
           <Grid container alignItems="center" spacing={2} sx={{ mt: 3 }}>
             <Grid item>
@@ -341,9 +383,14 @@ const handleDecrease = () => {
             outline: "none",
           }}
         >
-          <Typography id="modal-title" variant="h6" sx={{ mb: 2 }}>
+          {addresses.length>0 ? <Typography id="modal-title" variant="h6" sx={{ mb: 2 }}>
             Select Your Address
-          </Typography>
+          </Typography>:
+          <Typography id="modal-title" variant="h6" sx={{ mb: 2 }}>
+          Add Your Address
+        </Typography>
+          }
+          
           <FormGroup>
             {addresses.map((address, index) => (
               <FormControlLabel
@@ -351,7 +398,7 @@ const handleDecrease = () => {
                 control={
                   <Radio
                     checked={selectedAddressIndex === index}
-                    onChange={() => handleSelectAddress(index)} // ✅ Corrected here
+                    onChange={() => handleSelectAddress(index)} 
                   />
                 }
                 label={address}
@@ -362,18 +409,118 @@ const handleDecrease = () => {
             <Button onClick={handleCloseModal} sx={{ mr: 1 }}>
               Cancel
             </Button>
-            <Button
+            {addresses.length>0 ? <Button
               variant="contained"
               color="primary"
               onClick={() =>
                 router.push(`/order-summary?cart=0&product_id=${product._id}`)
               }
             >
+              
               Confirm Address
-            </Button>
+            </Button>:<Button
+              variant="contained"
+              color="primary"
+              onClick={() =>
+                handleOpenModal1()
+              }
+            >
+              
+              Add Address
+            </Button>}
+            
           </Box>
         </Box>
       </Modal>
+      <Modal open={modal1Open} onClose={handleCloseModal1}>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: 400,
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                      borderRadius: "4px",
+                      position: "relative",
+                    }}
+                  >
+                    <Button
+                      onClick={handleCloseModal1}
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: 8,
+                        minWidth: "auto",
+                        p: 1,
+                        color: "grey.700",
+                        '&:hover': {
+                          bgcolor: "grey.200",
+                          color: "grey.900",
+                        },
+                        zIndex: 1,
+                      }}
+                      aria-label="Close modal"
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M18 6L6 18"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M6 6L18 18"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Button>
+      
+                    <Typography variant="h6" sx={{ mb: 2, pr: 4 }}>
+                      Add Your Address
+                    </Typography>
+      
+                    <TextareaAutosize
+                      minRows={4}
+                      placeholder="Enter your full address here..."
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      style={{
+                        width: "100%",
+                        marginTop: "16px",
+                        padding: "8px",
+                        fontSize: "14px",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                      }}
+                    />
+      
+                    <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+                      <Button onClick={handleCloseModal1} sx={{ mr: 1 }}>
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSaveAddress}
+                      >
+                        Save Address
+                      </Button>
+                    </Box>
+                  </Box>
+                </Modal>
     </Container>
   );
 };

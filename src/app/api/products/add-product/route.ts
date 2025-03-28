@@ -7,7 +7,7 @@ connect();
 export async function POST(request: NextRequest) {
     try {
         const reqBody = await request.json();
-        const { product_name, seller_id, price, images, description, brand } = reqBody;
+        const { product_name, seller_id, price, images, description, brand, tags } = reqBody;
 
         // Validate inputs
         if (!product_name || !seller_id || !price || !Array.isArray(images) || images.length === 0 || !description) {
@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
             price,
             images,
             description,
-            brand
+            brand,
+            tags
         });
 
         return NextResponse.json({ message: "Product created successfully", product: savedProduct });

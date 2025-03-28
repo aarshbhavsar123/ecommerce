@@ -31,12 +31,18 @@ import { useSearchParams } from "next/navigation";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-
+interface ProductRating {
+  [productId: string]: number;
+}
 const Home = () => {
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [productRatings, setProductRatings] = useState<ProductRating>({});
+
   const searchParams = useSearchParams();
+
   const { user } = useAppContext();
   const router = useRouter();
 
@@ -166,7 +172,40 @@ const Home = () => {
       fetchOrderDetails();
     }
   }, [user, order_id, product_id, selectedAddressIndex]);
+  useEffect(() => {
+    // Only fetch ratings if there are products and a user is logged in
+    if (cartItems.length > 0 && user?.id) {
+      const fetchUserRatings = async () => {
+        try {
+          const productIds = cartItems.map((item: any) =>
+            typeof item.product === 'object' ? item.product._id : item.product
+          );
+      
+          // Correct way: Pass userId and productIds as query params
+          const response = await axios.get('/api/ratings/get-user-ratings', {
+            params: {
+              userId: user.id,
+              productIds: productIds.join(',') // Convert array to comma-separated string
+            }
+          });
+      
+          // Transform the response into a ratings dictionary
+          const ratingsMap = response.data.reduce((acc: any, rating: any) => {
+            acc[rating.productId] = rating.rating;
+            return acc;
+          }, {});
+      
+          // Update the state with fetched ratings
+          setProductRatings(ratingsMap);
+        } catch (error) {
+          console.error('Error fetching user ratings:', error);
+        }
+      };
+      
 
+      fetchUserRatings();
+    }
+  }, [cartItems, user?.id]);
   // Detect card company based on card number
   useEffect(() => {
     const detectCardCompany = () => {
@@ -229,7 +268,34 @@ const Home = () => {
   
     detectCardCompany();
   }, [cardNumber]);
-  
+  const handleRating = (productId: string, rating: number) => {
+    console.log(`Rated product ${productId} with ${rating} stars`);
+    
+    const rateProduct = async () => {
+      try {
+        const obj = {
+          userId: user.id,
+          productId: productId,
+          rating: rating
+        };
+        
+        const response = await axios.post("/api/ratings/add-rating", obj);
+        
+        // Update the ratings for this specific product
+        setProductRatings(prevRatings => ({
+          ...prevRatings,
+          [productId]: rating
+        }));
+        
+        console.log(response.data);
+      }
+      catch(e: any) {
+        console.error('Rating submission error:', e);
+      }
+    };
+    
+    rateProduct();
+  };
 
   const validatePaymentForm = () => {
     const errors: any = {};
@@ -427,61 +493,81 @@ const Home = () => {
         </Box>
 
         <Box sx={{ mt: 4 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Items in {cart === "2" ? "Order" : "Cart"}
-          </Typography>
-          <Table>
-            <TableBody>
-              {cartItems && cartItems.length > 0 ? (
-                cartItems.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                      >
-                        <Box
-                          component="img"
-                          src={item?.product?.images?.[0] || ""}
-                          alt={item?.product?.product_name || "Product image"}
-                          sx={{ width: 40, height: 40, objectFit: "cover" }}
-                        />
-                        <Typography variant="body1">
-                          {item?.product?.product_name || "Unknown Product"}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      x
-                      {cart === "1"
-                        ? item.quantity
-                        : cart === "2"
-                        ? item.quantity
-                        : Number(localStorage.getItem("quantity")) || 1}
-                    </TableCell>
-                    <TableCell align="right">
-                      $
-                      {(
-                        (cart === "1"
-                          ? item.product?.price * item.quantity
-                          : cart === "2"
-                          ? item.product?.price * item.quantity
-                          : item.product?.price *
-                            (Number(localStorage.getItem("quantity")) || 1)) ||
-                        0
-                      ).toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} align="center">
-                    No items in this {cart === "2" ? "order" : "cart"}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Box>
+  <Typography variant="h6" sx={{ mb: 2 }}>
+    Items in {cart === "2" ? "Order" : "Cart"}
+  </Typography>
+  <Table>
+    <TableBody>
+      {cartItems && cartItems.length > 0 ? (
+        cartItems.map((item, index) => (
+          <TableRow key={index}>
+            <TableCell>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Box
+                  component="img"
+                  src={item?.product?.images?.[0] || ""}
+                  alt={item?.product?.product_name || "Product image"}
+                  sx={{ width: 40, height: 40, objectFit: "cover" }}
+                />
+                <Typography variant="body1">
+                  {item?.product?.product_name || "Unknown Product"}
+                </Typography>
+              </Box>
+            </TableCell>
+            <TableCell>
+              x
+              {cart === "1"
+                ? item.quantity
+                : cart === "2"
+                ? item.quantity
+                : Number(localStorage.getItem("quantity")) || 1}
+            </TableCell>
+            <TableCell align="right">
+              $
+              {(
+                (cart === "1"
+                  ? item.product?.price * item.quantity
+                  : cart === "2"
+                  ? item.product?.price * item.quantity
+                  : item.product?.price *
+                    (Number(localStorage.getItem("quantity")) || 1)) ||
+                0
+              ).toFixed(2)}
+            </TableCell>
+            {cart === "2" && (
+      <TableCell align="center">
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Rate:
+        </Typography>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            style={{
+              cursor: "pointer",
+              color: star <= (productRatings[item.product._id] || 0) 
+                ? "#FFD700" 
+                : "#D3D3D3",
+            }}
+            onClick={() => handleRating(item.product._id, star)}
+          >
+            ★
+          </span>
+        ))}
+      </TableCell>
+    )}
+          </TableRow>
+        ))
+      ) : (
+        <TableRow>
+          <TableCell colSpan={3} align="center">
+            No items in this {cart === "2" ? "order" : "cart"}
+          </TableCell>
+        </TableRow>
+      )}
+    </TableBody>
+  </Table>
+</Box>
+
 
         <Box sx={{ mt: 4 }}>
           <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
